@@ -1,0 +1,1380 @@
+{
+  "service": {
+    "service": "nextjs-lambda-ci-deploy",
+    "serviceObject": {
+      "name": "nextjs-lambda-ci-deploy"
+    },
+    "provider": {
+      "stage": "dev",
+      "variableSyntax": "\\${([^{}]+?)}",
+      "name": "aws",
+      "runtime": "nodejs10.x",
+      "region": "us-east-2",
+      "versionFunctions": true,
+      "remoteFunctionData": null,
+      "compiledCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "ServerlessDeploymentBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+              "BucketEncryption": {
+                "ServerSideEncryptionConfiguration": [
+                  {
+                    "ServerSideEncryptionByDefault": {
+                      "SSEAlgorithm": "AES256"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "ServerlessDeploymentBucketPolicy": {
+            "Type": "AWS::S3::BucketPolicy",
+            "Properties": {
+              "Bucket": {
+                "Ref": "ServerlessDeploymentBucket"
+              },
+              "PolicyDocument": {
+                "Statement": [
+                  {
+                    "Action": "s3:*",
+                    "Effect": "Deny",
+                    "Principal": "*",
+                    "Resource": [
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":s3:::",
+                            {
+                              "Ref": "ServerlessDeploymentBucket"
+                            },
+                            "/*"
+                          ]
+                        ]
+                      }
+                    ],
+                    "Condition": {
+                      "Bool": {
+                        "aws:SecureTransport": false
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "NotDashfoundLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/nextjs-lambda-ci-deploy-dev-not-found"
+            }
+          },
+          "IndexLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/nextjs-lambda-ci-deploy-dev-index"
+            }
+          },
+          "ApiDashhelloLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/nextjs-lambda-ci-deploy-dev-api-hello"
+            }
+          },
+          "IamRoleLambdaExecution": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+              "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": [
+                        "lambda.amazonaws.com"
+                      ]
+                    },
+                    "Action": [
+                      "sts:AssumeRole"
+                    ]
+                  }
+                ]
+              },
+              "Policies": [
+                {
+                  "PolicyName": {
+                    "Fn::Join": [
+                      "-",
+                      [
+                        "nextjs-lambda-ci-deploy",
+                        "dev",
+                        "lambda"
+                      ]
+                    ]
+                  },
+                  "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:CreateLogStream",
+                          "logs:CreateLogGroup"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/nextjs-lambda-ci-deploy-dev*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:PutLogEvents"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/nextjs-lambda-ci-deploy-dev*:*:*"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "Path": "/",
+              "RoleName": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "nextjs-lambda-ci-deploy",
+                    "dev",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    "lambdaRole"
+                  ]
+                ]
+              }
+            }
+          },
+          "NotDashfoundLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/nextjs-lambda-ci-deploy/dev/1594436021390-2020-07-11T02:53:41.390Z/nextjs-lambda-ci-deploy.zip"
+              },
+              "FunctionName": "nextjs-lambda-ci-deploy-dev-not-found",
+              "Handler": "sls-next-build/_error.render",
+              "MemorySize": 1024,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              },
+              "Runtime": "nodejs10.x",
+              "Timeout": 6
+            },
+            "DependsOn": [
+              "NotDashfoundLogGroup"
+            ]
+          },
+          "NotDashfoundLambdaVersionoA15UeAGIwNOwau2btibvXFXqnKYIMAwILexkxGGHc": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "NotDashfoundLambdaFunction"
+              },
+              "CodeSha256": "KUlt34pjRVuO1x+VKG8XHcgGjM40w1lx3LtmfAQeX/0="
+            }
+          },
+          "IndexLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/nextjs-lambda-ci-deploy/dev/1594436021390-2020-07-11T02:53:41.390Z/nextjs-lambda-ci-deploy.zip"
+              },
+              "FunctionName": "nextjs-lambda-ci-deploy-dev-index",
+              "Handler": "sls-next-build/index.render",
+              "MemorySize": 1024,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              },
+              "Runtime": "nodejs10.x",
+              "Timeout": 6
+            },
+            "DependsOn": [
+              "IndexLogGroup"
+            ]
+          },
+          "IndexLambdaVersionkcolKxXkOI43gGM7w5dIosOi0dEGh7w5NlWflXXuw": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "IndexLambdaFunction"
+              },
+              "CodeSha256": "KUlt34pjRVuO1x+VKG8XHcgGjM40w1lx3LtmfAQeX/0="
+            }
+          },
+          "ApiDashhelloLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/nextjs-lambda-ci-deploy/dev/1594436021390-2020-07-11T02:53:41.390Z/nextjs-lambda-ci-deploy.zip"
+              },
+              "FunctionName": "nextjs-lambda-ci-deploy-dev-api-hello",
+              "Handler": "sls-next-build/api/hello.render",
+              "MemorySize": 1024,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              },
+              "Runtime": "nodejs10.x",
+              "Timeout": 6
+            },
+            "DependsOn": [
+              "ApiDashhelloLogGroup"
+            ]
+          },
+          "ApiDashhelloLambdaVersionPLsURnjHPs23UlEW2iWEEgqeO2a4VBaJSEEcdLTng": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "ApiDashhelloLambdaFunction"
+              },
+              "CodeSha256": "KUlt34pjRVuO1x+VKG8XHcgGjM40w1lx3LtmfAQeX/0="
+            }
+          },
+          "ApiGatewayRestApi": {
+            "Type": "AWS::ApiGateway::RestApi",
+            "Properties": {
+              "Name": "dev-nextjs-lambda-ci-deploy",
+              "EndpointConfiguration": {
+                "Types": [
+                  "EDGE"
+                ]
+              },
+              "Policy": ""
+            }
+          },
+          "ApiGatewayResourceProxyVar": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "{proxy+}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceApi": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "api",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceApiHello": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceApi"
+              },
+              "PathPart": "hello",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodProxyVarGet": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceProxyVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "NotDashfoundLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            }
+          },
+          "ApiGatewayMethodProxyVarHead": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "HEAD",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceProxyVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "NotDashfoundLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            }
+          },
+          "ApiGatewayMethodGet": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "IndexLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            }
+          },
+          "ApiGatewayMethodHead": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "HEAD",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "IndexLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            }
+          },
+          "ApiGatewayMethodApiHelloAny": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "ANY",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceApiHello"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "ApiDashhelloLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            }
+          },
+          "ApiGatewayDeployment1594436011169": {
+            "Type": "AWS::ApiGateway::Deployment",
+            "Properties": {
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "StageName": "dev"
+            },
+            "DependsOn": [
+              "ApiGatewayMethodProxyVarGet",
+              "ApiGatewayMethodProxyVarHead",
+              "ApiGatewayMethodGet",
+              "ApiGatewayMethodHead",
+              "ApiGatewayMethodApiHelloAny"
+            ]
+          },
+          "NotDashfoundLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "NotDashfoundLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "IndexLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "IndexLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "ApiDashhelloLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "ApiDashhelloLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "NextStaticAssetsS3Bucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+              "AccessControl": "PublicRead",
+              "CorsConfiguration": {
+                "CorsRules": [
+                  {
+                    "AllowedHeaders": [
+                      "*"
+                    ],
+                    "AllowedMethods": [
+                      "GET"
+                    ],
+                    "AllowedOrigins": [
+                      "*"
+                    ],
+                    "ExposedHeaders": [
+                      "Date"
+                    ],
+                    "Id": "NextStaticAssetsS3BucketId1",
+                    "MaxAge": "3600"
+                  }
+                ]
+              },
+              "BucketName": "nextjs-lambda-ci-deploy-assets-dev",
+              "WebsiteConfiguration": {
+                "IndexDocument": "index.html",
+                "ErrorDocument": "error.html"
+              }
+            },
+            "DeletionPolicy": "Retain"
+          },
+          "NextjsCloudFront": {
+            "Type": "AWS::CloudFront::Distribution",
+            "Properties": {
+              "DistributionConfig": {
+                "Origins": [
+                  {
+                    "DomainName": "nextjs-lambda-ci-deploy-assets-dev.s3.amazonaws.com",
+                    "Id": "S3Origin",
+                    "S3OriginConfig": {
+                      "OriginAccessIdentity": ""
+                    }
+                  },
+                  {
+                    "DomainName": "nextjs-lambda-ci-deploy-assets-dev.s3.amazonaws.com",
+                    "Id": "S3PublicOrigin",
+                    "OriginPath": "/public",
+                    "S3OriginConfig": {
+                      "OriginAccessIdentity": ""
+                    }
+                  },
+                  {
+                    "DomainName": {
+                      "Fn::Join": [
+                        "",
+                        [
+                          {
+                            "Ref": "ApiGatewayRestApi"
+                          },
+                          ".execute-api.us-east-2.amazonaws.com"
+                        ]
+                      ]
+                    },
+                    "Id": "ApiGatewayOrigin",
+                    "OriginPath": "/dev",
+                    "CustomOriginConfig": {
+                      "HTTPSPort": 443,
+                      "OriginProtocolPolicy": "https-only"
+                    }
+                  }
+                ],
+                "Enabled": "true",
+                "DefaultCacheBehavior": {
+                  "AllowedMethods": [
+                    "GET",
+                    "HEAD",
+                    "OPTIONS",
+                    "PUT",
+                    "PATCH",
+                    "POST",
+                    "DELETE"
+                  ],
+                  "TargetOriginId": "ApiGatewayOrigin",
+                  "Compress": "true",
+                  "ForwardedValues": {
+                    "QueryString": "true",
+                    "Cookies": {
+                      "Forward": "all"
+                    }
+                  },
+                  "ViewerProtocolPolicy": "https-only"
+                },
+                "CacheBehaviors": [
+                  {
+                    "AllowedMethods": [
+                      "GET",
+                      "HEAD",
+                      "OPTIONS"
+                    ],
+                    "TargetOriginId": "S3Origin",
+                    "Compress": "true",
+                    "ForwardedValues": {
+                      "QueryString": "false",
+                      "Cookies": {
+                        "Forward": "none"
+                      }
+                    },
+                    "ViewerProtocolPolicy": "https-only",
+                    "MinTTL": "50",
+                    "PathPattern": "static/*"
+                  },
+                  {
+                    "AllowedMethods": [
+                      "GET",
+                      "HEAD",
+                      "OPTIONS"
+                    ],
+                    "TargetOriginId": "S3Origin",
+                    "Compress": "true",
+                    "ForwardedValues": {
+                      "QueryString": "false",
+                      "Cookies": {
+                        "Forward": "none"
+                      }
+                    },
+                    "ViewerProtocolPolicy": "https-only",
+                    "MinTTL": "50",
+                    "PathPattern": "_next/*"
+                  },
+                  {
+                    "AllowedMethods": [
+                      "GET",
+                      "HEAD",
+                      "OPTIONS"
+                    ],
+                    "TargetOriginId": "S3PublicOrigin",
+                    "Compress": true,
+                    "ForwardedValues": {
+                      "QueryString": "false",
+                      "Cookies": {
+                        "Forward": "none"
+                      }
+                    },
+                    "ViewerProtocolPolicy": "https-only",
+                    "MinTTL": "50",
+                    "PathPattern": "favicon.ico"
+                  },
+                  {
+                    "AllowedMethods": [
+                      "GET",
+                      "HEAD",
+                      "OPTIONS"
+                    ],
+                    "TargetOriginId": "S3PublicOrigin",
+                    "Compress": true,
+                    "ForwardedValues": {
+                      "QueryString": "false",
+                      "Cookies": {
+                        "Forward": "none"
+                      }
+                    },
+                    "ViewerProtocolPolicy": "https-only",
+                    "MinTTL": "50",
+                    "PathPattern": "vercel.svg"
+                  }
+                ],
+                "PriceClass": "PriceClass_100"
+              }
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": {
+              "Ref": "ServerlessDeploymentBucket"
+            }
+          },
+          "NotDashfoundLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "NotDashfoundLambdaVersionoA15UeAGIwNOwau2btibvXFXqnKYIMAwILexkxGGHc"
+            }
+          },
+          "IndexLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "IndexLambdaVersionkcolKxXkOI43gGM7w5dIosOi0dEGh7w5NlWflXXuw"
+            }
+          },
+          "ApiDashhelloLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "ApiDashhelloLambdaVersionPLsURnjHPs23UlEW2iWEEgqeO2a4VBaJSEEcdLTng"
+            }
+          },
+          "ServiceEndpoint": {
+            "Description": "URL of the service endpoint",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  ".execute-api.",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ".",
+                  {
+                    "Ref": "AWS::URLSuffix"
+                  },
+                  "/dev"
+                ]
+              ]
+            }
+          },
+          "NextStaticAssetsS3BucketWebsiteURL": {
+            "Value": {
+              "Fn::GetAtt": [
+                "NextStaticAssetsS3Bucket",
+                "WebsiteURL"
+              ]
+            },
+            "Description": "URL for the S3 website hosting the static assets"
+          },
+          "NextStaticAssetsS3BucketSecureURL": {
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Fn::GetAtt": [
+                      "NextStaticAssetsS3Bucket",
+                      "DomainName"
+                    ]
+                  }
+                ]
+              ]
+            },
+            "Description": "S3 Bucket which holds the static assets"
+          },
+          "NextjsCloudFrontURL": {
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Fn::GetAtt": [
+                      "NextjsCloudFront",
+                      "DomainName"
+                    ]
+                  }
+                ]
+              ]
+            },
+            "Description": "CloudFront distribution URL"
+          }
+        }
+      },
+      "coreCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "ServerlessDeploymentBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+              "BucketEncryption": {
+                "ServerSideEncryptionConfiguration": [
+                  {
+                    "ServerSideEncryptionByDefault": {
+                      "SSEAlgorithm": "AES256"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "ServerlessDeploymentBucketPolicy": {
+            "Type": "AWS::S3::BucketPolicy",
+            "Properties": {
+              "Bucket": {
+                "Ref": "ServerlessDeploymentBucket"
+              },
+              "PolicyDocument": {
+                "Statement": [
+                  {
+                    "Action": "s3:*",
+                    "Effect": "Deny",
+                    "Principal": "*",
+                    "Resource": [
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":s3:::",
+                            {
+                              "Ref": "ServerlessDeploymentBucket"
+                            },
+                            "/*"
+                          ]
+                        ]
+                      }
+                    ],
+                    "Condition": {
+                      "Bool": {
+                        "aws:SecureTransport": false
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "NextStaticAssetsS3Bucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+              "AccessControl": "PublicRead",
+              "CorsConfiguration": {
+                "CorsRules": [
+                  {
+                    "AllowedHeaders": [
+                      "*"
+                    ],
+                    "AllowedMethods": [
+                      "GET"
+                    ],
+                    "AllowedOrigins": [
+                      "*"
+                    ],
+                    "ExposedHeaders": [
+                      "Date"
+                    ],
+                    "Id": "NextStaticAssetsS3BucketId1",
+                    "MaxAge": "3600"
+                  }
+                ]
+              },
+              "BucketName": "nextjs-lambda-ci-deploy-assets-dev",
+              "WebsiteConfiguration": {
+                "IndexDocument": "index.html",
+                "ErrorDocument": "error.html"
+              }
+            },
+            "DeletionPolicy": "Retain"
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": {
+              "Ref": "ServerlessDeploymentBucket"
+            }
+          },
+          "NextStaticAssetsS3BucketWebsiteURL": {
+            "Value": {
+              "Fn::GetAtt": [
+                "NextStaticAssetsS3Bucket",
+                "WebsiteURL"
+              ]
+            },
+            "Description": "URL for the S3 website hosting the static assets"
+          },
+          "NextStaticAssetsS3BucketSecureURL": {
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Fn::GetAtt": [
+                      "NextStaticAssetsS3Bucket",
+                      "DomainName"
+                    ]
+                  }
+                ]
+              ]
+            },
+            "Description": "S3 Bucket which holds the static assets"
+          }
+        }
+      },
+      "vpc": {}
+    },
+    "custom": {
+      "name": "nextjs-lambda-ci-deploy",
+      "serverless-nextjs": {
+        "assetsBucketName": "nextjs-lambda-ci-deploy-assets-dev",
+        "cloudFront": true
+      }
+    },
+    "plugins": [
+      "serverless-nextjs-plugin"
+    ],
+    "pluginsData": {},
+    "functions": {
+      "not-found": {
+        "handler": "sls-next-build/_error.render",
+        "events": [
+          {
+            "http": {
+              "path": "{proxy+}",
+              "method": "get",
+              "integration": "AWS_PROXY"
+            }
+          },
+          {
+            "http": {
+              "path": "{proxy+}",
+              "method": "head",
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "name": "nextjs-lambda-ci-deploy-dev-not-found",
+        "package": {},
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs10.x",
+        "vpc": {},
+        "versionLogicalId": "NotDashfoundLambdaVersionoA15UeAGIwNOwau2btibvXFXqnKYIMAwILexkxGGHc"
+      },
+      "index": {
+        "handler": "sls-next-build/index.render",
+        "events": [
+          {
+            "http": {
+              "path": "",
+              "method": "get",
+              "integration": "AWS_PROXY"
+            }
+          },
+          {
+            "http": {
+              "path": "",
+              "method": "head",
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "name": "nextjs-lambda-ci-deploy-dev-index",
+        "package": {},
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs10.x",
+        "vpc": {},
+        "versionLogicalId": "IndexLambdaVersionkcolKxXkOI43gGM7w5dIosOi0dEGh7w5NlWflXXuw"
+      },
+      "api-hello": {
+        "handler": "sls-next-build/api/hello.render",
+        "events": [
+          {
+            "http": {
+              "path": "api/hello",
+              "method": "any",
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "name": "nextjs-lambda-ci-deploy-dev-api-hello",
+        "package": {},
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs10.x",
+        "vpc": {},
+        "versionLogicalId": "ApiDashhelloLambdaVersionPLsURnjHPs23UlEW2iWEEgqeO2a4VBaJSEEcdLTng"
+      }
+    },
+    "resources": {
+      "Resources": {
+        "NextStaticAssetsS3Bucket": {
+          "Type": "AWS::S3::Bucket",
+          "Properties": {
+            "AccessControl": "PublicRead",
+            "CorsConfiguration": {
+              "CorsRules": [
+                {
+                  "AllowedHeaders": [
+                    "*"
+                  ],
+                  "AllowedMethods": [
+                    "GET"
+                  ],
+                  "AllowedOrigins": [
+                    "*"
+                  ],
+                  "ExposedHeaders": [
+                    "Date"
+                  ],
+                  "Id": "NextStaticAssetsS3BucketId1",
+                  "MaxAge": "3600"
+                }
+              ]
+            },
+            "BucketName": "nextjs-lambda-ci-deploy-assets-dev",
+            "WebsiteConfiguration": {
+              "IndexDocument": "index.html",
+              "ErrorDocument": "error.html"
+            }
+          },
+          "DeletionPolicy": "Retain"
+        },
+        "NextjsCloudFront": {
+          "Type": "AWS::CloudFront::Distribution",
+          "Properties": {
+            "DistributionConfig": {
+              "Origins": [
+                {
+                  "DomainName": "nextjs-lambda-ci-deploy-assets-dev.s3.amazonaws.com",
+                  "Id": "S3Origin",
+                  "S3OriginConfig": {
+                    "OriginAccessIdentity": ""
+                  }
+                },
+                {
+                  "DomainName": "nextjs-lambda-ci-deploy-assets-dev.s3.amazonaws.com",
+                  "Id": "S3PublicOrigin",
+                  "OriginPath": "/public",
+                  "S3OriginConfig": {
+                    "OriginAccessIdentity": ""
+                  }
+                },
+                {
+                  "DomainName": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        {
+                          "Ref": "ApiGatewayRestApi"
+                        },
+                        ".execute-api.us-east-2.amazonaws.com"
+                      ]
+                    ]
+                  },
+                  "Id": "ApiGatewayOrigin",
+                  "OriginPath": "/dev",
+                  "CustomOriginConfig": {
+                    "HTTPSPort": 443,
+                    "OriginProtocolPolicy": "https-only"
+                  }
+                }
+              ],
+              "Enabled": "true",
+              "DefaultCacheBehavior": {
+                "AllowedMethods": [
+                  "GET",
+                  "HEAD",
+                  "OPTIONS",
+                  "PUT",
+                  "PATCH",
+                  "POST",
+                  "DELETE"
+                ],
+                "TargetOriginId": "ApiGatewayOrigin",
+                "Compress": "true",
+                "ForwardedValues": {
+                  "QueryString": "true",
+                  "Cookies": {
+                    "Forward": "all"
+                  }
+                },
+                "ViewerProtocolPolicy": "https-only"
+              },
+              "CacheBehaviors": [
+                {
+                  "AllowedMethods": [
+                    "GET",
+                    "HEAD",
+                    "OPTIONS"
+                  ],
+                  "TargetOriginId": "S3Origin",
+                  "Compress": "true",
+                  "ForwardedValues": {
+                    "QueryString": "false",
+                    "Cookies": {
+                      "Forward": "none"
+                    }
+                  },
+                  "ViewerProtocolPolicy": "https-only",
+                  "MinTTL": "50",
+                  "PathPattern": "static/*"
+                },
+                {
+                  "AllowedMethods": [
+                    "GET",
+                    "HEAD",
+                    "OPTIONS"
+                  ],
+                  "TargetOriginId": "S3Origin",
+                  "Compress": "true",
+                  "ForwardedValues": {
+                    "QueryString": "false",
+                    "Cookies": {
+                      "Forward": "none"
+                    }
+                  },
+                  "ViewerProtocolPolicy": "https-only",
+                  "MinTTL": "50",
+                  "PathPattern": "_next/*"
+                },
+                {
+                  "AllowedMethods": [
+                    "GET",
+                    "HEAD",
+                    "OPTIONS"
+                  ],
+                  "TargetOriginId": "S3PublicOrigin",
+                  "Compress": true,
+                  "ForwardedValues": {
+                    "QueryString": "false",
+                    "Cookies": {
+                      "Forward": "none"
+                    }
+                  },
+                  "ViewerProtocolPolicy": "https-only",
+                  "MinTTL": "50",
+                  "PathPattern": "favicon.ico"
+                },
+                {
+                  "AllowedMethods": [
+                    "GET",
+                    "HEAD",
+                    "OPTIONS"
+                  ],
+                  "TargetOriginId": "S3PublicOrigin",
+                  "Compress": true,
+                  "ForwardedValues": {
+                    "QueryString": "false",
+                    "Cookies": {
+                      "Forward": "none"
+                    }
+                  },
+                  "ViewerProtocolPolicy": "https-only",
+                  "MinTTL": "50",
+                  "PathPattern": "vercel.svg"
+                }
+              ],
+              "PriceClass": "PriceClass_100"
+            }
+          }
+        }
+      },
+      "Outputs": {
+        "NextStaticAssetsS3BucketWebsiteURL": {
+          "Value": {
+            "Fn::GetAtt": [
+              "NextStaticAssetsS3Bucket",
+              "WebsiteURL"
+            ]
+          },
+          "Description": "URL for the S3 website hosting the static assets"
+        },
+        "NextStaticAssetsS3BucketSecureURL": {
+          "Value": {
+            "Fn::Join": [
+              "",
+              [
+                "https://",
+                {
+                  "Fn::GetAtt": [
+                    "NextStaticAssetsS3Bucket",
+                    "DomainName"
+                  ]
+                }
+              ]
+            ]
+          },
+          "Description": "S3 Bucket which holds the static assets"
+        },
+        "NextjsCloudFrontURL": {
+          "Value": {
+            "Fn::Join": [
+              "",
+              [
+                "https://",
+                {
+                  "Fn::GetAtt": [
+                    "NextjsCloudFront",
+                    "DomainName"
+                  ]
+                }
+              ]
+            ]
+          },
+          "Description": "CloudFront distribution URL"
+        }
+      },
+      "AWSTemplateFormatVersion": "2010-09-09"
+    },
+    "serviceFilename": "serverless.yml",
+    "layers": {},
+    "isDashboardMonitoringPreconfigured": false,
+    "artifact": "/Users/fduque/Documents/ApplicationsTest/nextjs-lambda-ci-deploy/.serverless/nextjs-lambda-ci-deploy.zip"
+  },
+  "package": {
+    "artifactDirectoryName": "serverless/nextjs-lambda-ci-deploy/dev/1594436021390-2020-07-11T02:53:41.390Z",
+    "artifact": "nextjs-lambda-ci-deploy.zip"
+  }
+}
